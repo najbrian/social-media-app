@@ -58,4 +58,18 @@ router.put('/:postId', async (req, res) => {
   }
 })
 
+// Delete Post Route
+router.delete('/:postId', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId)
+    if (!post.author.equals(req.user._id)) {
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
+    const deletePost = await Post.findByIdAndDelete(req.params.postId)
+    res.status(200).json(deletePost)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 module.exports = router
