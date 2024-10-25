@@ -43,4 +43,19 @@ router.get('/:postId', async (req, res) => {
   }
 })
 
+//Update Post Route
+router.put('/:postId', async (req, res) => {
+  try {
+    const post = await Post.findByIdAndUpdate(req.params.postId)
+    if (!post.author.equals(req.user._id)) {
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
+    const updatedPost = await Post.findByIdAndUpdate(req.params.postId, req.body, { new: true })
+    updatedPost._doc.author = req.user
+    res.status(200).json(updatedPost)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 module.exports = router
