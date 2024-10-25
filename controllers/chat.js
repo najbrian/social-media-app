@@ -32,6 +32,34 @@ router.post('/:user1/:user2', async (req, res) => {
     }
 })
 
+// find user's chats
+router.get('/:userId', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.userId) 
+        const chats = await Chat.find({
+            members: {$in: [user]}
+        })
 
+        res.status(200).json(chats);
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+// find specific chat 
+router.get('/:user1/:user2', async (req, res) => {
+    try {
+        const user1 = await User.findById(req.params.user1)
+        const user2 = await User.findById(req.params.user2)
+
+        const chat = await Chat.find({
+            members: {$all: [user1, user2] }
+        })
+
+        res.status(200).json(chat);
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
 
 module.exports = router;
