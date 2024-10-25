@@ -7,6 +7,7 @@ const router = express.Router()
 
 // ========= Protected Routes =========
 router.use(verifyToken)
+// Create Post Route
 router.post('/', async (req, res) => {
     try {
       req.body.author = req.user._id
@@ -17,6 +18,18 @@ router.post('/', async (req, res) => {
       console.log(error)
       res.status(500).json({ error: error.message })
     }
+})
+
+// Get All Posts Route
+router.get('/', async (req, res) => {
+  try {
+    const posts = await Post.find({})
+    .populate('author')
+    .sort({ createdAt: 'desc' })
+    res.status(200).json(posts)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
 })
 
 module.exports = router
