@@ -72,4 +72,21 @@ router.delete('/:postId', async (req, res) => {
   }
 })
 
+// Create Comment Route
+router.post('/:postId/comments', async (req, res) => {
+  try {
+    req.body.author = req.user._id
+    const post = await Post.findById(req.params.postId)
+    post.comments.push(req.body)
+    await post.save()
+
+    const newComment = post.comments[post.comments.length - 1]
+    newComment._doc.author = req.user
+    res.status(201).json(newComment)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+)
+
 module.exports = router
