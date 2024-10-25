@@ -62,4 +62,17 @@ router.get('/:user1/:user2', async (req, res) => {
     }
 })
 
+// delete chat 
+router.delete('/:chatId', async (req, res) => {
+    try {
+        const chatId = await Chat.findById(req.params.chatId)
+
+        const deleteChat = await Chat.findByIdAndDelete(chatId)
+        res.status(200).json(deleteChat)
+        
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
 module.exports = router;
