@@ -89,4 +89,32 @@ router.post('/:postId/comments', async (req, res) => {
 }
 )
 
+// Update Comment Route
+router.put('/:postId/comments/:commentId', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId)
+    const comment = post.comments.id(req.params.commentId)
+    if (!comment.author.equals(req.user._id)) {
+      return res.status(403).json({ error: 'Unauthorized' })
+    }
+    comment.set(req.body)
+    await post.save()
+    res.status(200).json(comment)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Delete Comment Route
+router.delete('/:postId/comments/:commentId', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId)
+    post.comments.remove({ _id: req.params.commentId })
+    await post.save()
+    res.status(200).json({ message: 'Comment Deleted' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 module.exports = router
