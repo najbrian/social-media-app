@@ -72,6 +72,22 @@ router.delete('/:postId', async (req, res) => {
   }
 })
 
+// Like Post & Remove Like from Post
+router.post('/:postId/like', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.postId)
+    if (post.likes.includes(req.user._id)) {
+      post.likes.pull(req.user._id)
+    } else {
+      post.likes.push(req.user._id)
+    }
+    await post.save()
+    res.status(200).json(post)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // Create Comment Route
 router.post('/:postId/comments', async (req, res) => {
   try {
@@ -117,21 +133,6 @@ router.delete('/:postId/comments/:commentId', async (req, res) => {
   }
 })
 
-// Like Post & Remove Like from Post
-router.post('/:postId/like', async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.postId)
-    if (post.likes.includes(req.user._id)) {
-      post.likes.pull(req.user._id)
-    } else {
-      post.likes.push(req.user._id)
-    }
-    await post.save()
-    res.status(200).json(post)
-  } catch (error) {
-    res.status(500).json({ error: error.message })
-  }
-})
 
 // Like Comment & Remove Like from Comment
 router.post('/:postId/comments/:commentId/like', async (req, res) => {
