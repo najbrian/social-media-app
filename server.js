@@ -9,6 +9,7 @@ const usersRouter = require('./controllers/users');
 const profilesRouter = require('./controllers/profiles');
 const postsRouter = require('./controllers/posts');
 const chatRouter = require('./controllers/chat');
+const messageRouter = require('./controllers/message');
 
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -24,6 +25,7 @@ app.use('/users', usersRouter);
 app.use('/profiles', profilesRouter);
 app.use('/posts', postsRouter);
 app.use('/chat', chatRouter);
+app.use('/message', messageRouter);
 
 app.listen(3000, () => {
     console.log('The express app is ready!');
