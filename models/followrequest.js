@@ -13,10 +13,12 @@ const followRequestSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'approved', 'rejected'],
+        enum: ['pending', 'approved', 'rejected', 'blocked'],
         default: 'pending'
     },
     created_at: { type: Date, default: Date.now }
 });
 
 const FollowRequest = mongoose.model('FollowRequest', followRequestSchema);
+
+module.exports = FollowRequest;
