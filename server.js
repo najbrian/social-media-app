@@ -4,10 +4,13 @@ const cors = require('cors');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+
+// routes
 const testJWTRouter = require('./controllers/test-jwt');
 const usersRouter = require('./controllers/users');
 const profilesRouter = require('./controllers/profiles');
 const postsRouter = require('./controllers/posts');
+const messageRouter = require('./controllers/message');
 const chatRouter = require('./controllers/chats');
 const followRequestRouter = require('./controllers/followrequests');
 
@@ -25,6 +28,7 @@ app.use('/users', usersRouter);
 app.use('/profiles', profilesRouter);
 app.use('/posts', postsRouter);
 app.use('/chat', chatRouter);
+app.use('/message', messageRouter);
 app.use('/requests', followRequestRouter);
 
 app.listen(3000, () => {

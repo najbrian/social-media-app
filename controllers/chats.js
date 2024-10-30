@@ -2,6 +2,7 @@ const express = require('express')
 const verifyToken = require('../middleware/verify-token')
 const Chat = require('../models/chat')
 const User = require('../models/user')
+const Message = require('../models/message')
 const router = express.Router()
 
 // ========== Public Routes ===========
@@ -47,7 +48,7 @@ router.get('/:userId', async (req, res) => {
 })
 
 // find specific chat 
-router.get('/:user1/:user2', async (req, res) => {
+router.get('/:chatId/:user1/:user2', async (req, res) => {
     try {
         const user1 = await User.findById(req.params.user1)
         const user2 = await User.findById(req.params.user2)
@@ -63,16 +64,18 @@ router.get('/:user1/:user2', async (req, res) => {
 })
 
 // delete chat 
-router.delete('/:chatId', async (req, res) => {
+router.delete('/:chatId/delete', async (req, res) => {
     try {
-        const chatId = await Chat.findById(req.params.chatId)
+        const chatId = await Chat.findById(req.params.chatId);
 
-        const deleteChat = await Chat.findByIdAndDelete(chatId)
+        const deleteChat = await Chat.findByIdAndDelete(chatId);
         res.status(200).json(deleteChat)
         
     } catch (error) {
         res.status(500).json({ error: error.message })
     }
 })
+
+
 
 module.exports = router;
