@@ -4,6 +4,8 @@ const cors = require('cors');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
+
+// routes
 const testJWTRouter = require('./controllers/test-jwt');
 const usersRouter = require('./controllers/users');
 const profilesRouter = require('./controllers/profiles');

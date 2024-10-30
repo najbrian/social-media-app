@@ -10,7 +10,7 @@ const router = express.Router()
 // ========= Protected Routes =========
 router.use(verifyToken)
 
-
+// create message 
 router.post('/:chatId', async (req, res) => {
     try {
         if (!req.user || !req.user._id) {
@@ -44,5 +44,51 @@ router.post('/:chatId', async (req, res) => {
     }
 })
 
+// edit message
+router.put ('/:messageId', async (req, res) => {
+    try {
+        const message = await Message.findById(req.params.messageId);
+
+        // checks if the recipe author is authorized to update
+        if (!message.sender.equals(req.user._id)) {
+            return res.status(403).send("You are not authorize to do that!");
+        }
+
+        const editedMsg = await Message.findByIdAndUpdate(
+            req.params.messageId,
+            req.body,
+            { new: true }
+        );
+
+        editedMsg._doc.sender = req.user;
+
+        res.status(200).json(editedMsg);
+
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+
+}) 
+
+
+// delete message 
+router.delete ('/:messageId/delete', async (req, res) => {
+    try {
+        const message = await Message.findById(req.params.messageId);
+         // checks if the recipe author is authorized to update
+        if (!message.sender.equals(req.user._id)) {
+            return res.status(403).send("You are not authorize to do that!");
+        }
+
+        const deletedMsg = await Message.findByIdAndDelete(req.params.messageId)
+
+        res.status(200).json(deletedMsg);
+
+    } catch (error) {
+         res.status(500).json({ error: error.message })
+    }
+})
+
 
 module.exports = router;
+
