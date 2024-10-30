@@ -10,8 +10,9 @@ const testJWTRouter = require('./controllers/test-jwt');
 const usersRouter = require('./controllers/users');
 const profilesRouter = require('./controllers/profiles');
 const postsRouter = require('./controllers/posts');
-const chatRouter = require('./controllers/chat');
 const messageRouter = require('./controllers/message');
+const chatRouter = require('./controllers/chats');
+const followRequestRouter = require('./controllers/followrequests');
 
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -28,6 +29,7 @@ app.use('/profiles', profilesRouter);
 app.use('/posts', postsRouter);
 app.use('/chat', chatRouter);
 app.use('/message', messageRouter);
+app.use('/requests', followRequestRouter);
 
 app.listen(3000, () => {
     console.log('The express app is ready!');
