@@ -8,11 +8,12 @@ router.get('/:userId', verifyToken, async (req, res) => {
         if (req.user._id !== req.params.userId){
             return res.status(401).json({ error: "Unauthorized"})
         }
-        const user = await User.findById(req.user._id);
+        const user = await User.findById(req.user._id).populate('followers').populate('following');
         if (!user) {
             res.status(404)
             throw new Error('Profile not found.');
         }
+        
         res.json({ user });
     } catch (error) {
         if (res.statusCode === 404) {

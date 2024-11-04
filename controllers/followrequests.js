@@ -54,17 +54,21 @@ router.get('/incoming/:userId', async (req, res) => {
 //Approve or Reject Follow Request Route
 router.patch('/:requestId', async (req, res) => {
   try {
-    const followRequest = await FollowRequest.findById(req.params.requestId)
-    if (!followRequest.recipient.equals(req.user._id)) {
+    const followRequest = await FollowRequest.findById(req.params.requestId).populate('requester').populate('recipient')
+    if (!followRequest.recipient._id.equals(req.user._id)) {
       return res.status(403).json({ error: 'Unauthorized' })
     }
     if (req.body.status === 'approved') {
       followRequest.status = 'approved'
+      followRequest.requester.following.push(followRequest.recipient._id)
+      followRequest.recipient.followers.push(followRequest.requester._id)
     } else if (req.body.status === 'rejected') {
       followRequest.status = 'rejected'
     } else {
       return res.status(400).json({ error: 'Invalid status' })
     }
+    await followRequest.requester.save()
+    await followRequest.recipient.save()
     await followRequest.save()
     res.status(200).json(followRequest)
   } catch (error) {
@@ -75,24 +79,26 @@ router.patch('/:requestId', async (req, res) => {
 //Unfollow Route
 router.delete('/:user1/:user2', async (req, res) => {
   try {
-    user1 = req.params.user1
-    user2 = req.params.user2
+    const { user1, user2 } = req.params;
 
     if (user1 === user2) {
-      return res.status(400).json({ error: 'You cannot unfollow yourself' })
+      return res.status(400).json({ error: 'You cannot unfollow yourself' });
     }
 
-    const followRequest = await FollowRequest.findOne({ requester: user1, recipient: user2, status: 'approved' })
+    const followRequest = await FollowRequest.findOneAndDelete({ requester: user1, recipient: user2, status: 'approved' }).populate('requester').populate('recipient');
     if (!followRequest) {
-      return res.status(400).json({ error: 'You are not following this user' })
+      return res.status(400).json({ error: 'You are not following this user' });
     }
-// need to look into if I follow the user, how do I unfollow them
-    await followRequest.delete()
-    res.status(200).json(followRequest)
+    followRequest.requester.following = followRequest.requester.following.filter(following => !following.equals(followRequest.recipient._id));
+    followRequest.recipient.followers = followRequest.recipient.followers.filter(follower => !follower.equals(followRequest.requester._id));
+    await followRequest.requester.save();
+    await followRequest.recipient.save();
+
+    res.status(200).json(followRequest);
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    res.status(500).json({ error: error.message });
   }
-})
+});
 
 // Block User Route
 router.patch('/block/:user1/:user2', async (req, res) => {
@@ -130,5 +136,6 @@ router.get('/outgoing/:userId', async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 })
+
 
 module.exports = router;
